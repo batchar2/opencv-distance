@@ -14,6 +14,7 @@ class Point:
     def __str__(self):
         return "%d" % self.radius
 
+
 class Distance:
     def __init__(self, k):
         self.distance = -1
@@ -37,6 +38,7 @@ class Distance:
             if point_distance != 0:
                 self.distance = (width_point*self.k)/(float(point_distance)/float(width))
 
+
 class CameraReaderThread(threading.Thread):
     def __init__(self, cam_number, k, lock):
         threading.Thread.__init__(self)
@@ -58,8 +60,6 @@ class CameraReaderThread(threading.Thread):
         height, width, depth = frame.shape
         
         while not self.killed:
-            
-
             _, frame = camera.read()
             frames[self.cam_number] = frame
 
@@ -70,12 +70,14 @@ class CameraReaderThread(threading.Thread):
             self.distance.mathDistance(contours, width)
             self.lock.release()
 
+
 class SignalHandler:
     def __init__(self, target):
         self.target=target
 
     def handle_sigterm(self, signum, frame):
         self.target.is_stop = True
+
 
 class Program:
     def __init__(self):
@@ -125,6 +127,7 @@ class Program:
         self.cam_readers[0].join()
         self.cam_readers[1].join()
         sys.exit()
+
 
 if __name__ == '__main__':
     frames = [None, None]
