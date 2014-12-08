@@ -32,37 +32,35 @@ class Distance:
         points = []
         for cnt in contours:
             (x,y), radius = cv2.minEnclosingCircle(cnt)
-            points.append(Point(x, radius))
+            points.append(Point(x, y, radius))
 
         points.sort(key=lambda x: x.radius,  reverse=True)
-
+        
         if len(points) >= 2:
             point_distance = abs(points[0].x - points[1].x)
             width_point = 5.0
             if point_distance != 0:
-                    self.dist = (width_point*self.k)/(float(point_distance)/float(width))
+                self.dist = (width_point*self.k)/(float(point_distance)/float(width))
 
-                    x, y = int((points[0].x + points[1].x)/2), int((points[0].y + points[1].y)/2)
-                    pointO = Point(width/2, height/2)
-                    pointA = Point(x, y)
-                    pointB = Point(pointO.x, pointA.y)
+                x, y = int((points[0].x + points[1].x)/2), int((points[0].y + points[1].y)/2)
+                pointO = Point(width/2, height/2)
+                pointA = Point(x, y)
+                pointB = Point(pointO.x, pointA.y)
 
-                    OB = math.sqrt((pointO.x-pointB.x)**2 + (pointO.y-pointB.y)**2)
-                    AB = math.sqrt((pointA.x-pointB.x)**2 + (pointA.y-pointB.y)**2)
+                OB = math.sqrt((pointO.x-pointB.x)**2 + (pointO.y-pointB.y)**2)
+                AB = math.sqrt((pointA.x-pointB.x)**2 + (pointA.y-pointB.y)**2)
 
-                    sign_ab, sign_ob = 1, 1
-                    if pointO.y < pointA.y: sign_ab = -1
-                    #if pointO.x < pointA.x: sign_ob = -1
+                d = 1
+                if pointO.y < pointA.y:
+                    d = -1
+                
+                AB_cm = (AB/(point_distance))*width_point    
+                OB_cm = (OB/(point_distance))*width_point*d
 
-
-                    AB_cm = (AB/(point_distance))*width_point*sign_ob    
-                    OB_cm = (OB/(point_distance))*width_point*sign_ab
-
-                    AO_cm = math.sqrt(self.dist**2 - AB_cm**2 )
-                    self.coordiantes[self.axis] = round(AO_cm, 1)          
-                    self.coordiantes['Z'] = round(OB_cm, 1)
-
-
+                AO_cm = math.sqrt(self.dist**2 - AB_cm**2)
+                self.coordiantes[self.axis] = round(AO_cm, 1)          
+                self.coordiantes['Z'] = round(OB_cm, 1)
+        
 class CameraReaderThread(threading.Thread):
     def __init__(self, cam_number, axis, k, lock):
         threading.Thread.__init__(self)
